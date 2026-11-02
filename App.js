@@ -1,20 +1,54 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import AppNavigator from './src/navigation/AppNavigator';
+import { initializeDatabase } from './src/database/database';
 
 export default function App() {
+  const [databaseReady, setDatabaseReady] = React.useState(false);
+  const [databaseError, setDatabaseError] = React.useState(null);
+  
+  useEffect(() => {
+    async function setupDatabase() {
+      try {
+        await initializeDatabase();
+        setDatabaseReady(true);
+      } catch (error) {
+        setDatabaseError(error.message);
+        console.error('Error initialization failed!', error);
+      }
+    }
+
+    setupDatabase();
+  }, []);
+
+  if (databaseError) {
+    return (
+      <View style={{
+        flex: 1,
+        justifyContent: 'center',
+        padding:20
+      }}>
+        <Text>Error initializing database: {databaseError}</Text>
+      </View>
+    );
+  }
+
+  if(!databaseReady) {
+    return (
+      <View style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <Text>Preparing RecipeHub...</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <AppNavigator />
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
