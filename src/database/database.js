@@ -22,6 +22,16 @@ export async function initializeDatabase() {
     );
   `);
 
+  const columns = await db.getAllAsync("PRAGMA table_info(recipes);");
+
+  const hasImageColumn = columns.some(column => column.name === 'image');
+
+  if (!hasImageColumn) {
+    await db.execAsync(`
+      ALTER TABLE recipes ADD COLUMN image TEXT;
+    `);
+  }
+
   // Create Favorites table
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS favorites (

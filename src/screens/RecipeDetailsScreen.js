@@ -3,13 +3,13 @@ import { View, Text, StyleSheet } from 'react-native';
 import colors from '../styles/colors';
 
 export default function RecipeDetailsScreen({ route }) {
-  const { recipeId } = route.params || {};
+  const { recipe } = route.params;
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Recipe Details</Text>
       <Text style={styles.subtitle}>
-        Selected Recipe ID: {recipeId || 'Not selected'}
+        Selected Recipe: {recipe.name || 'Not selected'}
       </Text>
     </View>
   );
