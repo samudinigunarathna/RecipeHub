@@ -132,7 +132,7 @@ const recipes = [
       'Season with salt and pepper.',
       'Garnish with parsley and serve.'
     ],
-    image: 'pasta-alfredo'
+    image: 'pasta_alfredo'
   }
 ];
 
@@ -208,7 +208,7 @@ export async function updateRecipeImages() {
 
     await db.runAsync(`
     UPDATE recipes
-    SET image = ? WHERE name = ?`, 'pasta-alfredo', 'Pasta Alfredo'
+    SET image = ? WHERE name = ?`, 'pasta_alfredo', 'Pasta Alfredo'
   );
 
   await db.runAsync(`
