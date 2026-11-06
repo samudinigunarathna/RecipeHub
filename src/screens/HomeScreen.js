@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import colors from '../styles/colors';
 import { getAllRecipes } from '../database/recipeData';
 import recipeImages from '../database/recipeImages';
@@ -8,32 +9,24 @@ export default function HomeScreen({ navigation }) {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadRecipes = async () => {
-      setLoading(true);
-      const allRecipes = await getAllRecipes();
-      setRecipes(allRecipes);
-      setLoading(false);
-    };
-
-    loadRecipes();
-  }, []);
-
   const loadRecipes = async () => {
-    try{
+    try {
       const data = await getAllRecipes();
       setRecipes(data);
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error loading recipes:', error);
-    }
-    finally{
+    } finally {
       setLoading(false);
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      loadRecipes();
+    }, [])
+  );
+
   const openRecipes = (recipe) => {
-    // Navigate to the RecipeDetail screen with the selected recipe
     navigation.navigate('RecipeDetails', { recipe });
   };
 
@@ -41,64 +34,67 @@ export default function HomeScreen({ navigation }) {
     <ScrollView
       style={styles.container}
       showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.greeting}>Hello, Food Lover! 👋</Text>
+    >
+      <Text style={styles.greeting}>Hello, Food Lover! 👋</Text>
 
-        <Text style={styles.title}>What would you like to cook?</Text>
+      <Text style={styles.title}>What would you like to cook?</Text>
 
-        <Text style={styles.subtitle}>
-          Discover delicious recipes for every day.
+      <Text style={styles.subtitle}>
+        Discover delicious recipes for every day.
+      </Text>
+
+      <View style={styles.featured}>
+        <Text style={styles.featuredTitle}>
+          Welcome to RecipeHub 🍳
         </Text>
 
-        <View style={styles.featured}>
-          <Text style={styles.featuredTitle}>
-            Welcome to RecipeHub 🍳
-          </Text>
+        <Text style={styles.featuredText}>
+          Your favorite recipes, always available offline.
+        </Text>
+      </View>
 
-          <Text style={styles.featuredText}>
-            Your favorite recipes, always available offline.
-          </Text>
-        </View>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Popular Recipes</Text>
+        <Text style={styles.recipeCount}>{recipes.length} Recipes</Text>
+      </View>
 
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Popular Recipes</Text>
-          <Text style={styles.recipeCount}>{recipes.length} Recipes</Text>
-        </View>
-
-        {loading ? (
-          <ActivityIndicator size="large" 
+      {loading ? (
+        <ActivityIndicator
+          size="large"
           color={colors.primary}
-          style={styles.loader} 
-          />
-        ) : recipes.length === 0 ? (
-          <Text style={styles.emptyText}>No recipes found. Please add some recipes to your database.</Text>
-        ) : (
-          <View style={styles.recipeList}>
-            {recipes.map((recipe) => (
-              <TouchableOpacity
-                key={recipe.id}
-                style={styles.recipeCard}
-                onPress={() => openRecipes(recipe)}
-              >
-                <Image
-                  source={recipeImages[recipe.image]}
-                  style={styles.recipeImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.recipeInfo}>
-                  <Text style={styles.recipeName}>{recipe.name}</Text>
-                  <Text style={styles.recipeCategory}>{recipe.category}</Text>
-                  <Text style={styles.recipeTime}>
-                    {recipe.prepTime + recipe.cookTime} minutes | {recipe.servings} servings
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-      </ScrollView>
-    );
-  }
+          style={styles.loader}
+        />
+      ) : recipes.length === 0 ? (
+        <Text style={styles.emptyText}>No recipes found. Please add some recipes to your database.</Text>
+      ) : (
+        <View style={styles.recipeList}>
+          {recipes.map((recipe) => (
+            <TouchableOpacity
+              key={recipe.id}
+              style={styles.recipeCard}
+              activeOpacity={0.85}
+              onPress={() => openRecipes(recipe)}
+            >
+              <Image
+                source={recipeImages[recipe.image]}
+                style={styles.recipeImage}
+                resizeMode="cover"
+              />
+              <View style={styles.recipeInfo}>
+                <Text style={styles.recipeName}>{recipe.name}</Text>
+                <Text style={styles.recipeCategory}>{recipe.category}</Text>
+                <Text style={styles.recipeTime}>
+                  {(recipe.prepTime || 0) + (recipe.cookTime || 0)} minutes | {recipe.servings || '-'} servings
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+      <View style={styles.bottomSpace} />
+    </ScrollView>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {

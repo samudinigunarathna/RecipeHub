@@ -43,34 +43,3 @@ export async function initializeDatabase() {
 
   console.log('RecipeHub database initialized!');
 }
-
-export async function insertRecipes() {
-  const db = await dbPromise;
-
-  for (const recipe of addRecipes) {
-    const existing = await db.getFirstAsync(
-      'SELECT id FROM recipes WHERE name = ?',
-      recipe.name
-    );
-
-    if (!existing) {
-      await db.runAsync(
-        `INSERT INTO recipes
-        (name, category, description, prepTime, cookTime,
-         servings, ingredients, instructions, image)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        recipe.name,
-        recipe.category,
-        recipe.description,
-        recipe.prepTime,
-        recipe.cookTime,
-        recipe.servings,
-        recipe.ingredients,
-        recipe.instructions,
-        recipe.image
-      );
-    }
-  }
-
-  console.log('Recipes inserted successfully!');
-}

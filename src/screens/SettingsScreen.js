@@ -4,11 +4,13 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  Image,
+  TouchableOpacity,
+  Linking,
 } from 'react-native';
 
 import colors from '../styles/colors';
 import { getAllRecipes } from '../database/recipeData';
-import { Link } from '@react-navigation/native';
 
 export default function SettingsScreen() {
   const [recipeCount, setRecipeCount] = useState(0);
@@ -40,9 +42,11 @@ export default function SettingsScreen() {
 
       {/* Application Information */}
       <View style={styles.appCard}>
-        <View style={styles.appIcon}>
-          <Text style={styles.appIconText}>🍽️</Text>
-        </View>
+        <Image
+          source={require('../../assets/images/logo.jpg')}
+          style={styles.appLogo}
+          resizeMode="cover"
+        />
 
         <Text style={styles.appName}>RecipeHub</Text>
 
@@ -132,14 +136,35 @@ export default function SettingsScreen() {
         </Text>
       </View>
 
-      <Text style={styles.footer}>
-        RecipeHub © 2026 {"\n"}
-        Implemented by Samudini Gunarathna {"\n"}
-        BSc in IT - Faculty of Applied Science {"\n"}
-        {"\n"}
-        contact us {"\n"}
-          email: <Link src = "samudinigunarathna@gmail.com">samudinigunarathna@gmail.com</Link>
-      </Text>
+      {/* Footer Box */}
+      <View style={styles.footerBox}>
+        <View style={styles.footerHeader}>
+          <Text style={styles.footerBrand}>RecipeHub</Text>
+          <Text style={styles.footerCopyright}>© 2026</Text>
+        </View>
+
+        <View style={styles.authorSection}>
+          <Text style={styles.authorLabel}>Implemented by</Text>
+          <Text style={styles.authorName}>Samudini Gunarathna</Text>
+          <Text style={styles.authorDegree}>
+            BSc in IT - Faculty of Applied Science
+          </Text>
+        </View>
+
+        <View style={styles.footerDivider} />
+
+        <View style={styles.contactSection}>
+          <Text style={styles.contactLabel}>contact us</Text>
+          <TouchableOpacity
+            style={styles.emailPill}
+            activeOpacity={0.7}
+            onPress={() => Linking.openURL('mailto:samudinigunarathna@gmail.com')}
+          >
+            <Text style={styles.emailPrefix}>email: </Text>
+            <Text style={styles.emailAddress}>samudinigunarathna@gmail.com</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
     </ScrollView>
   );
@@ -179,18 +204,11 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
 
-  appIcon: {
-    width: 75,
-    height: 75,
+  appLogo: {
+    width: 85,
+    height: 85,
     borderRadius: 22,
-    backgroundColor: '#FCEBDD',
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 14,
-  },
-
-  appIconText: {
-    fontSize: 38,
   },
 
   appName: {
@@ -342,10 +360,109 @@ const styles = StyleSheet.create({
     marginTop: 18,
   },
 
-  footer: {
-    textAlign: 'center',
+  footerBox: {
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 24,
+    marginBottom: 15,
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+
+  footerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 14,
+  },
+
+  footerBrand: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.primaryDark,
+    letterSpacing: 0.5,
+  },
+
+  footerCopyright: {
+    fontSize: 13,
+    color: colors.secondaryText,
+    fontWeight: '600',
+  },
+
+  authorSection: {
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+
+  authorLabel: {
+    fontSize: 11,
+    color: colors.secondaryText,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 4,
+    fontWeight: '600',
+  },
+
+  authorName: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: colors.text,
+    marginBottom: 4,
+  },
+
+  authorDegree: {
     fontSize: 12,
     color: colors.secondaryText,
-    marginTop: 28,
+    textAlign: 'center',
+  },
+
+  footerDivider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: colors.border,
+    marginVertical: 14,
+  },
+
+  contactSection: {
+    alignItems: 'center',
+    width: '100%',
+  },
+
+  contactLabel: {
+    fontSize: 11,
+    color: colors.secondaryText,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+
+  emailPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FCEBDD',
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+  },
+
+  emailPrefix: {
+    fontSize: 12,
+    color: colors.secondaryText,
+    fontWeight: '500',
+  },
+
+  emailAddress: {
+    fontSize: 13,
+    color: colors.primaryDark,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });
