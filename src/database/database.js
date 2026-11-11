@@ -42,4 +42,20 @@ export async function initializeDatabase() {
   `);
 
   console.log('RecipeHub database initialized!');
+
+  //Create Recipe Reviews table
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS recipe_reviews (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      recipeId INTEGER NOT NULL UNIQUE,
+      rating INTEGER NOT NULL CHECK(rating >= 1 AND rating <= 5),
+      notes TEXT,
+      createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (recipeId) REFERENCES recipes(id)
+    );
+  `);
+
+  console.log('RecipeHub database initialized!');
+  console.log('Recipe Reviews table initialized!');
 }

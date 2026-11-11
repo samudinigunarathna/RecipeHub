@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { addFavoriteRecipe, removeFavoriteRecipe, isFavoriteRecipe } from '../database/favoritesData';
+import { getRecipeReview, saveRecipeReview, deleteRecipeReview } from '../database/reviewsData';
 import colors from '../styles/colors';
 import recipeImages from '../database/recipeImages';
 
 export default function RecipeDetailsScreen({ route, navigation }) {
   const { recipe } = route.params;
   const [isFavorite, setIsFavorite] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [reviewNotes, setReviewNotes] = useState('');
+  const [hasReview, setHasReview] = useState(false);
   const recipeImage = recipeImages[recipe.image];
   const ingredients = Array.isArray(recipe.ingredients)
     ? recipe.ingredients
@@ -41,6 +45,78 @@ export default function RecipeDetailsScreen({ route, navigation }) {
     } catch (error) {
       console.log('Favorite update error:', error);
     }
+  };
+
+  useEffect(() => {
+    const loadReview = async () => {
+      try {
+        const review = await getRecipeReview(recipe.id);
+
+        if (review) {
+          setRating(review.rating);
+          setReviewNotes(review.notes || '');
+          setHasReview(true);
+        } else {
+          setRating(0);
+          setReviewNotes('');
+          setHasReview(false);
+        }
+      } catch (error) {
+        console.log('Error loading review:', error);
+      }
+    };
+
+    loadReview();
+  }, [recipe.id]);
+
+  const handleSaveReview = async () => {
+    if (rating === 0) {
+      Alert.alert('Rating Required', 'Please select a star rating.');
+      return;
+    }
+
+    try {
+      await saveRecipeReview(
+        recipe.id,
+        rating,
+        reviewNotes.trim()
+      );
+
+      setHasReview(true);
+
+      Alert.alert('Success', 'Your review has been saved!');
+    } catch (error) {
+      console.log('Error saving review:', error);
+      Alert.alert('Error', 'Unable to save your review.');
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    Alert.alert(
+      'Delete Review',
+      'Are you sure you want to delete your review?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteRecipeReview(recipe.id);
+
+              setRating(0);
+              setReviewNotes('');
+              setHasReview(false);
+
+              Alert.alert('Deleted', 'Your review has been deleted.');
+            } catch (error) {
+              console.log('Error deleting review:', error);
+              Alert.alert('Error', 'Unable to delete your review.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -135,6 +211,84 @@ export default function RecipeDetailsScreen({ route, navigation }) {
             <Text style={styles.stepText}>{instruction}</Text>
           </View>
         ))}
+
+        <Text style={styles.sectionTitle}>Your Review 🌟</Text>
+        {instructions.map((instruction, index) => {
+          return (
+            <View key={index} style={styles.stepCard}>
+              <View style={styles.stepNumber}>
+                <Text style={styles.stepNumberText}>{index + 1}</Text>
+              </View>
+              <Text style={styles.stepText}>{instruction}</Text>
+            </View>
+          );
+        })}
+      </View>
+
+      {/* Rating and Review Section */}
+      <Text style={styles.sectionTitle}>Rate This Recipe ⭐</Text>
+
+      <View style={styles.reviewCard}>
+        <Text style={styles.reviewSubtitle}>
+          How would you rate this recipe?
+        </Text>
+
+        <View style={styles.starsContainer}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <TouchableOpacity
+              key={star}
+              onPress={() => setRating(star)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.starIcon}>
+                {star <= rating ? '★' : '☆'}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <Text style={styles.ratingLabel}>
+          {rating === 0
+            ? 'Select your rating'
+            : `${rating} out of 5 stars`}
+        </Text>
+
+        <Text style={styles.reviewSubtitle}>
+          Your Personal Cooking Notes
+        </Text>
+
+        <TextInput
+          style={styles.reviewInput}
+          placeholder="Share your experience with this recipe..."
+          placeholderTextColor={colors.secondaryText}
+          multiline
+          numberOfLines={4}
+          textAlignVertical="top"
+          value={reviewNotes}
+          onChangeText={setReviewNotes}
+        />
+
+        <TouchableOpacity
+          style={styles.saveReviewButton}
+          onPress={handleSaveReview}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.saveReviewButtonText}>
+            {hasReview ? 'Update Review' : 'Save Review'}
+          </Text>
+        </TouchableOpacity>
+
+        {hasReview && (
+          <TouchableOpacity
+            style={styles.deleteReviewButton}
+            onPress={handleDeleteReview}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.deleteReviewButtonText}>
+              Delete My Review
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </ScrollView>
   );
@@ -357,5 +511,75 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#514740',
     lineHeight: 22,
+  },
+  reviewCard: {
+    backgroundColor: colors.surface,
+    padding: 18,
+    borderRadius: 16,
+    marginTop: 5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    marginBottom: 20,
+  },
+  reviewSubtitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 12,
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 12,
+    gap: 12,
+  },
+  starIcon: {
+    fontSize: 38,
+    color: '#F5A623',
+  },
+  ratingLabel: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: colors.secondaryText,
+    marginBottom: 22,
+  },
+  reviewInput: {
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    padding: 14,
+    minHeight: 110,
+    fontSize: 14,
+    color: colors.text,
+    marginBottom: 16,
+  },
+  saveReviewButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  saveReviewButtonText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  deleteReviewButton: {
+    borderWidth: 1,
+    borderColor: colors.danger,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  deleteReviewButtonText: {
+    color: colors.danger,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
