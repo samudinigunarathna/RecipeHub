@@ -5,8 +5,57 @@ import { getRecipeReview, saveRecipeReview, deleteRecipeReview } from '../databa
 import colors from '../styles/colors';
 import recipeImages from '../database/recipeImages';
 
+function adjustIngredientQuantity(ingredient, originalServings, newServings) {
+  if (!originalServings || !newServings) {
+    return ingredient;
+  }
+
+  const ratio = newServings / originalServings;
+
+  // Match quantities such as 2, 1/2, 1 1/2, or 0.5
+  const match = ingredient.match(
+    /^(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?)(.*)$/
+  );
+
+  // Keep ingredients such as "Salt to taste" unchanged
+  if (!match) {
+    return ingredient;
+  }
+
+  const quantityText = match[1];
+  const remainingText = match[2];
+
+  let quantity;
+
+  if (quantityText.includes(' ')) {
+    const parts = quantityText.split(' ');
+    const whole = Number(parts[0]);
+    const fractionParts = parts[1].split('/');
+
+    quantity =
+      whole + Number(fractionParts[0]) / Number(fractionParts[1]);
+  } else if (quantityText.includes('/')) {
+    const parts = quantityText.split('/');
+
+    quantity = Number(parts[0]) / Number(parts[1]);
+  } else {
+    quantity = Number(quantityText);
+  }
+
+  const adjustedQuantity = quantity * ratio;
+
+  // Avoid displaying unnecessary decimal places
+  const formattedQuantity = Number(
+    adjustedQuantity.toFixed(2)
+  ).toString();
+
+  return `${formattedQuantity}${remainingText}`;
+}
+
 export default function RecipeDetailsScreen({ route, navigation }) {
   const { recipe } = route.params;
+  const originalServings = Number(recipe.servings) || 1;
+  const [selectedServings, setSelectedServings] = useState(originalServings);
   const [isFavorite, setIsFavorite] = useState(false);
   const [rating, setRating] = useState(0);
   const [reviewNotes, setReviewNotes] = useState('');
@@ -160,6 +209,57 @@ export default function RecipeDetailsScreen({ route, navigation }) {
         </View>
       </View>
 
+      {/* Adjustable Serving Calculator */}
+      <View style={styles.servingCard}>
+        <View style={styles.servingHeader}>
+          <View>
+            <Text style={styles.servingTitle}>Adjust Servings 👥</Text>
+            <Text style={styles.servingSubtitle}>
+              Change the number of people
+            </Text>
+          </View>
+
+          <View style={styles.servingControls}>
+            <TouchableOpacity
+              style={styles.servingButton}
+              onPress={() =>
+                setSelectedServings(current =>
+                  Math.max(1, current - 1)
+                )
+              }
+            >
+              <Text style={styles.servingButtonText}>−</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.servingCount}>
+              {selectedServings}
+            </Text>
+
+            <TouchableOpacity
+              style={styles.servingButton}
+              onPress={() =>
+                setSelectedServings(current =>
+                  Math.min(50, current + 1)
+                )
+              }
+            >
+              <Text style={styles.servingButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {selectedServings !== originalServings && (
+          <TouchableOpacity
+            onPress={() => setSelectedServings(originalServings)}
+            style={styles.resetServingButton}
+          >
+            <Text style={styles.resetServingText}>
+              Reset to original ({originalServings})
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       <View style={styles.content}>
         <Text style={styles.title}>{recipe.name}</Text>
         {recipe.description ? (
@@ -198,7 +298,13 @@ export default function RecipeDetailsScreen({ route, navigation }) {
         {ingredients.map((ingredient, index) => (
           <View key={index} style={styles.ingredientRow}>
             <Text style={styles.bullet}>•</Text>
-            <Text style={styles.ingredientText}>{ingredient}</Text>
+            <Text style={styles.ingredientText}>
+              {adjustIngredientQuantity(
+                ingredient,
+                originalServings,
+                selectedServings
+              )}
+            </Text>
           </View>
         ))}
 
@@ -580,6 +686,68 @@ const styles = StyleSheet.create({
   deleteReviewButtonText: {
     color: colors.danger,
     fontSize: 14,
+    fontWeight: '600',
+  },
+  servingCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  servingHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  servingTitle: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: colors.text,
+  },
+  servingSubtitle: {
+    fontSize: 12,
+    color: colors.secondaryText,
+    marginTop: 4,
+  },
+  servingControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  servingButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  servingButtonText: {
+    color: '#FFFFFF',
+    fontSize: 23,
+    fontWeight: 'bold',
+    lineHeight: 27,
+  },
+  servingCount: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.text,
+    minWidth: 22,
+    textAlign: 'center',
+  },
+  resetServingButton: {
+    alignSelf: 'flex-start',
+    marginTop: 12,
+    paddingVertical: 5,
+  },
+  resetServingText: {
+    color: colors.primaryDark,
+    fontSize: 13,
     fontWeight: '600',
   },
 });
