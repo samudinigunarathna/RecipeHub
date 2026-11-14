@@ -5,14 +5,15 @@
 # 🍳 RecipeHub
 ### *Your Favorite Recipes, Always Available Offline*
 
-An offline-first mobile recipe management application built with **React Native**, **Expo SDK 58**, and **SQLite**. Designed for culinary enthusiasts, home cooks, and food lovers to explore, search, scale, review, and organize recipes anywhere, anytime — no internet required.
+An offline-first mobile recipe management application built with **React Native**, **Expo SDK 58**, and **SQLite**. Designed for culinary enthusiasts, home cooks, and food lovers to explore, search, scale, review, listen to step-by-step instructions, and organize recipes anywhere, anytime — no internet required.
 
 ---
 
 <!-- Badges -->
 [![React Native](https://img.shields.io/badge/React%20Native-0.88.1-61DAFB?logo=react&logoColor=black)](#)
-[![Expo](https://img.shields.io/badge/Expo%20SDK-58.0.22-000020?logo=expo&logoColor=white)](#)
+[![Expo](https://img.shields.io/badge/Expo%20SDK-58.0.25-000020?logo=expo&logoColor=white)](#)
 [![Expo SQLite](https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white)](#)
+[![Expo Speech](https://img.shields.io/badge/Voice%20Assistant-expo--speech-FF8800?logo=expo&logoColor=white)](#)
 [![React Navigation](https://img.shields.io/badge/Navigation-v7-6B52AE?logo=reactnavigation&logoColor=white)](#)
 [![License](https://img.shields.io/badge/License-MIT-E87945)](#)
 [![Offline First](https://img.shields.io/badge/Status-100%25%20Offline-success)](#)
@@ -29,6 +30,7 @@ The fundamental purpose of **RecipeHub** is to eliminate dependence on active in
 | :--- | :--- |
 | **📴 True Offline Accessibility** | Complete independence from network coverage. All recipe details, ingredients, preparation steps, and images remain accessible in remote locations, low-signal kitchens, or offline mode. |
 | **⚡ Local SQLite Persistence** | Implement a reliable, local relational database (`expo-sqlite`) to ensure fast queries, atomic operations, and seamless data persistence across app restarts. |
+| **🎙️ Voice Chef (Read Instructions)** | Hands-free culinary assistance powered by Text-to-Speech (`expo-speech`) that reads each cooking instruction aloud, with step-by-step progress tracking, repeat, pause/stop, and previous/next navigation. |
 | **⚖️ Dynamic Serving Size Calculator** | Intelligently recalculate and rescale ingredient quantities in real time based on user-chosen serving counts (including fractional quantities, e.g., `1/2 cup`, `1.5 tbsp`). |
 | **⭐ Personal Review & Rating System** | Enable users to document culinary experiments by rating each dish (1–5 stars) and saving custom cooking notes and personal tips. |
 | **❤️ Favorites & Collection Management** | Allow instant one-tap bookmarking so users can compile and revisit their go-to daily and festive dishes. |
@@ -49,9 +51,16 @@ The fundamental purpose of **RecipeHub** is to eliminate dependence on active in
 │   ├── Total, Prep, and Cooking duration breakdowns
 │   ├── 🔢 Interactive Serving Calculator (+ / - real-time scaling)
 │   ├── Step-by-step numbered cooking instructions
+│   ├── 🎙️ Voice Chef: Hands-free step-by-step speech reader
 │   └── 🌟 Star Rating & Custom Cooking Notes
+├── 🎙️ Voice Chef Screen:
+│   ├── Step progress indicator (e.g., Step 2 of 6)
+│   ├── Large instruction display
+│   ├── Automated Text-to-Speech playback (`expo-speech`)
+│   ├── Repeat instruction and Stop reading controls
+│   └── Previous / Next navigation buttons
 ├── ❤️ Favorites Hub: Dedicated offline bookmarks with instant one-tap removal
-└── ⚙️ App Settings & Diagnostics: Live recipe metrics and project attribution
+└── ⚙️ App Settings & Diagnostics: Live recipe metrics, author attribution & contact card
 ```
 
 ### 1. 📴 100% Offline Database Architecture
@@ -59,16 +68,20 @@ The fundamental purpose of **RecipeHub** is to eliminate dependence on active in
 - Relational schema connecting `recipes`, `favorites`, and `recipe_reviews`.
 - Local bundled assets guarantee instant load times and zero network consumption.
 
-### 2. 🔢 Smart Serving Calculator
+### 2. 🎙️ Voice Chef (Audio Assistant)
+- Reads cooking steps aloud using **`expo-speech`** so you can cook without touching the screen with messy hands.
+- Features real-time step progress bars, replay buttons (`Repeat Instruction`), stop speech buttons, and step-by-step forward/backward navigation.
+
+### 3. 🔢 Smart Serving Calculator
 - Automatically detects fractional and decimal quantities (e.g., `2 godamba rotis`, `1/2 cup spring onions`, `1.5 cups milk`).
 - Updates ingredient numbers instantly when increasing or decreasing the target serving size, preserving non-numeric units (such as `"Salt to taste"`).
 
-### 3. ⭐ Interactive Reviews & Personal Notes
+### 4. ⭐ Interactive Reviews & Personal Notes
 - Rate recipes from 1 to 5 stars.
 - Write, update, and persist personalized culinary notes for future preparation adjustments.
 - Dedicated modal alerts confirm review creations and deletions.
 
-### 4. 🧭 Intuitive Tab & Stack Navigation
+### 5. 🧭 Intuitive Tab & Stack Navigation
 - Powered by **React Navigation v7** with bottom tabs and native stacks.
 - Custom vector icons (`@expo/vector-icons` Ionicons) with active pill highlight styling matching the app's brand theme.
 
@@ -157,12 +170,14 @@ RecipeHub-Offline-Recipe-App/
 │   │   ├── SearchScreen.js           # Search bar & category filtering
 │   │   ├── CategoriesScreen.js       # Category cards & filtered listings
 │   │   ├── FavoritesScreen.js        # Saved bookmarks
-│   │   ├── RecipeDetailsScreen.js    # Serving scale, steps & reviews
-│   │   └── SettingsScreen.js         # App details, statistics & contacts
+│   │   ├── RecipeDetailsScreen.js    # Serving scale, steps, voice chef trigger & reviews
+│   │   ├── VoiceChefScreen.js        # Step-by-step audio assistant (expo-speech)
+│   │   └── SettingsScreen.js         # App details, statistics, author & contact card
 │   └── styles/
 │       └── colors.js                 # Unified color system
 ├── App.js                            # App entry & DB bootstrap
 ├── app.json                          # Expo configuration & plugins
+├── eas.json                          # EAS build configuration
 └── package.json                      # Dependencies and scripts
 ```
 
@@ -203,9 +218,10 @@ npx expo start
 
 ## 🛠️ Tech Stack & Libraries
 
-- **Framework**: [React Native](https://reactnative.dev/) (v0.88)
-- **Tooling**: [Expo SDK 58](https://docs.expo.dev/)
+- **Framework**: [React Native](https://reactnative.dev/) (v0.88.1)
+- **Tooling**: [Expo SDK 58](https://docs.expo.dev/) (v58.0.25)
 - **Local Storage**: [`expo-sqlite`](https://docs.expo.dev/versions/latest/sdk/sqlite/)
+- **Voice Assistance (TTS)**: [`expo-speech`](https://docs.expo.dev/versions/latest/sdk/speech/)
 - **Navigation**: [`@react-navigation/native`](https://reactnavigation.org/), Bottom Tabs, Native Stack
 - **Icons**: [`@expo/vector-icons`](https://docs.expo.dev/guides/icons/) (Ionicons)
 - **Typography & Assets**: [`expo-font`](https://docs.expo.dev/versions/latest/sdk/font/)
@@ -226,4 +242,3 @@ npx expo start
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE) — see the LICENSE file for details.
-
