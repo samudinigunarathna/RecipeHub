@@ -11,7 +11,6 @@
     "expo-dev-client": "~58.0.20",
     "expo-font": "~58.0.12",
     "expo-speech": "~58.0.4",
-    "expo-speech-recognition": "^58.0.1",
     "expo-sqlite": "~58.0.17",
     "expo-status-bar": "~58.0.5",
     "react": "19.3.0",

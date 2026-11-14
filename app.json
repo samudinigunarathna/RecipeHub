@@ -4,21 +4,18 @@
     "slug": "RecipeHub",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true,
-      "infoPlist": {
-        "NSMicrophoneUsageDescription": "RecipeHub uses the microphone to recognize cooking voice commands.",
-        "NSSpeechRecognitionUsageDescription": "RecipeHub uses speech recognition to control cooking instructions."
-      }
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE"
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ],
       "package": "com.samuama.RecipeHub"
     },
     "web": {
@@ -27,8 +24,7 @@
     "plugins": [
       "expo-sqlite",
       "expo-font",
-      "expo-status-bar",
-      "expo-speech-recognition"
+      "expo-status-bar"
     ],
     "extra": {
       "eas": {
