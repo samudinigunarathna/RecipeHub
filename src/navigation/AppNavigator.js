@@ -11,6 +11,7 @@ import CategoriesScreen from '../screens/CategoriesScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import RecipeDetailsScreen from '../screens/RecipeDetailsScreen';
+import ShoppingListScreen from '../screens/ShoppingListScreen';
 
 import colors from '../styles/colors';
 
@@ -58,6 +59,9 @@ function MainTabs() {
             case 'Favorites':
               iconName = focused ? 'heart' : 'heart-outline';
               break;
+            case 'ShoppingList':
+              iconName = focused ? 'cart' : 'cart-outline';
+              break;
             case 'Settings':
               iconName = focused ? 'settings' : 'settings-outline';
               break;
@@ -95,6 +99,12 @@ function MainTabs() {
         name="Favorites"
         component={FavoritesScreen}
         options={{ tabBarLabel: 'Favorites' }}
+      />
+
+      <Tab.Screen
+        name="ShoppingList"
+        component={ShoppingListScreen}
+        options={{ tabBarLabel: 'Shopping List' }}
       />
 
       <Tab.Screen

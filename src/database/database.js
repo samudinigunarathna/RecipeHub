@@ -41,8 +41,6 @@ export async function initializeDatabase() {
     );
   `);
 
-  console.log('RecipeHub database initialized!');
-
   //Create Recipe Reviews table
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS recipe_reviews (
@@ -56,6 +54,20 @@ export async function initializeDatabase() {
     );
   `);
 
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS shopping_list (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ingredient TEXT NOT NULL,
+      recipeId INTEGER,
+      recipeName TEXT,
+      isPurchased INTEGER DEFAULT 0,
+      createdAt TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
   console.log('RecipeHub database initialized!');
+  console.log('Recipes table initialized!');
+  console.log('Favorites table initialized!');
   console.log('Recipe Reviews table initialized!');
+  console.log('Shopping List table initialized!');
 }
