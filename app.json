@@ -15,14 +15,21 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "package": "com.samuama.RecipeHub"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-sqlite",
-      "expo-font"
-    ]
+      "expo-font",
+      "expo-status-bar"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e84399cc-9b63-48b6-a2d6-d185e3b6bca1"
+      }
+    }
   }
 }

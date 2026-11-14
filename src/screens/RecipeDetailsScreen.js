@@ -318,17 +318,32 @@ export default function RecipeDetailsScreen({ route, navigation }) {
           </View>
         ))}
 
-        <Text style={styles.sectionTitle}>Your Review 🌟</Text>
-        {instructions.map((instruction, index) => {
-          return (
-            <View key={index} style={styles.stepCard}>
-              <View style={styles.stepNumber}>
-                <Text style={styles.stepNumberText}>{index + 1}</Text>
-              </View>
-              <Text style={styles.stepText}>{instruction}</Text>
-            </View>
-          );
-        })}
+        {/* Voice Chef Button */}
+        <TouchableOpacity
+          style={styles.voiceChefButton}
+          onPress={() =>
+            navigation.navigate('VoiceChef', {
+              recipe: {
+                ...recipe,
+                instructions,
+              },
+            })
+          }
+          activeOpacity={0.85}
+        >
+          <Text style={styles.voiceChefIcon}>🎙️</Text>
+
+          <View style={styles.voiceChefButtonContent}>
+            <Text style={styles.voiceChefButtonTitle}>
+              Start Cooking with Voice Chef
+            </Text>
+            <Text style={styles.voiceChefButtonSubtitle}>
+              Listen to step-by-step cooking instructions
+            </Text>
+          </View>
+
+          <Text style={styles.voiceChefArrow}>›</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Rating and Review Section */}
@@ -749,5 +764,46 @@ const styles = StyleSheet.create({
     color: colors.primaryDark,
     fontSize: 13,
     fontWeight: '600',
+  },
+  voiceChefButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    padding: 17,
+    borderRadius: 15,
+    marginTop: 18,
+    marginBottom: 15,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+  },
+
+  voiceChefIcon: {
+    fontSize: 30,
+    marginRight: 13,
+  },
+
+  voiceChefButtonContent: {
+    flex: 1,
+  },
+
+  voiceChefButtonTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+
+  voiceChefButtonSubtitle: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    marginTop: 5,
+  },
+
+  voiceChefArrow: {
+    fontSize: 30,
+    color: '#FFFFFF',
+    marginLeft: 8,
   },
 });

@@ -11,6 +11,7 @@ import CategoriesScreen from '../screens/CategoriesScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import RecipeDetailsScreen from '../screens/RecipeDetailsScreen';
+import VoiceChefScreen from '../screens/VoiceChefScreen';
 import ShoppingListScreen from '../screens/ShoppingListScreen';
 
 import colors from '../styles/colors';
@@ -137,6 +138,18 @@ export default function AppNavigator() {
           headerTintColor: colors.text,
           headerTitleStyle: {
             fontWeight: 'bold',
+          },
+        }}
+      />
+
+      <Stack.Screen
+        name="VoiceChef"
+        component={VoiceChefScreen}
+        options={{
+          title: 'RecipeHub Voice Chef',
+          headerTintColor: colors.text,
+          headerStyle: {
+            backgroundColor: colors.background,
           },
         }}
       />
